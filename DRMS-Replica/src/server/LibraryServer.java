@@ -303,8 +303,7 @@ public class LibraryServer implements ILibrary, Runnable
 	 */
 	public void run()
 	{
-		
-		DatagramSocket aSocket = null;
+		UDPServer udpServer = null;
 		try {
 			
 			Endpoint endpoint = Endpoint.publish("http://localhost:8080/"+this.instituteName, this);
@@ -315,7 +314,7 @@ public class LibraryServer implements ILibrary, Runnable
 			
 			
 			//UDP part
-			UDPServer udpServer = new UDPServer("",this.udpPort);
+			udpServer = new UDPServer("",this.udpPort);
 			
 			byte [] buffer = new byte[10000];
 			this.logger.info("UPD server for "+this.instituteName+" is running on port: "+udpPort);
@@ -354,7 +353,7 @@ public class LibraryServer implements ILibrary, Runnable
 			err.printStackTrace();
 		}
 		finally{
-			aSocket.close();
+			udpServer.close();
 		}
 	}
 
