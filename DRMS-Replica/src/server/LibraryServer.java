@@ -310,24 +310,24 @@ public class LibraryServer implements ILibrary, Runnable
 			
 			if(endpoint.isPublished()) {
 				System.out.println("Endpoint published for "+this.instituteName);
-			}
-			
+			}	
 			
 			//UDP part
 			udpServer = new UDPServer("",this.udpPort);
 			
 			byte [] buffer = new byte[10000];
 			this.logger.info("UPD server for "+this.instituteName+" is running on port: "+udpPort);
+			String response = "";
 			while(true) {
 				String data = udpServer.recieveRequest();
 				String[] requestParts = data.split(":");
-				String response = "";
+				
 				if(requestParts.length == 2 ) {
 					//non return request
 					logger.info("Nonreturner request received at"+this.instituteName);
 					response = calculateNonReturners(Integer.parseInt(requestParts[1].trim()));
 				}
-				else {
+				else if(requestParts[0].equals("reserve")) {
 					//inter library reserve request
 					logger.info("Interlibrary reserve request recieved at: "+this.instituteName);
 					Book book = findBook(requestParts[1], requestParts[2]);
@@ -346,6 +346,12 @@ public class LibraryServer implements ILibrary, Runnable
 						response = "false";
 					}
 				}
+				else if(requestParts[1].equals("create")){
+					//create account
+					 response = createAccount(requestParts[2], requestParts[3], requestParts[4], 
+							 requestParts[5], requestParts[6], requestParts[7], requestParts[8])?"true":"false";
+				}
+					
 				udpServer.sendResponse(response);
 			}
 		}
@@ -427,15 +433,15 @@ public class LibraryServer implements ILibrary, Runnable
 	{
 		try{
 
-			LibraryServer library1 = new LibraryServer("Concordia", 6785);
+			LibraryServer library1 = new LibraryServer("Concordia", 5001);
 			Thread server1 =  new Thread(library1);
 			server1.start();
 			
-			LibraryServer library2 = new LibraryServer("Mcgill", 6786);
+			LibraryServer library2 = new LibraryServer("Mcgill", 5002);
 			Thread server2 =  new Thread(library2);
 			server2.start();
 			
-			LibraryServer library3 = new LibraryServer("Montreal", 6787);
+			LibraryServer library3 = new LibraryServer("Montreal", 5003);
 			Thread server3 =  new Thread(library3);
 			server3.start();
 			

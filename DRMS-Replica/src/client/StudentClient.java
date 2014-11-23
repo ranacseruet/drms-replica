@@ -1,4 +1,5 @@
 package client;
+import UDP.UDPClient;
 import common.*;
 
 import java.util.Scanner;
@@ -63,7 +64,12 @@ public class StudentClient extends BaseClient
 			String pass = "1234";
 			String bookName = "Bones";
 			String authorName = "Kathy";
-			boolean test = server.createAccount("test", "test", "test@test", "123123123", username, pass, "concordia");
+			UDPClient udpClient = new UDPClient("localhost", 5001);
+			String message = "req:create:eftakhairul:islam:rain@gmail.com:12342499:rain:pass123456:Concordia";
+			String response = udpClient.send(message);
+			System.out.println("UDP create account status: "+response);
+			boolean test =  Boolean.parseBoolean(response);
+			//boolean test = server.createAccount("test", "test", "test@test", "123123123", username, pass, "concordia");
 			if(test)
 			{
 				System.out.println("student created with username: "+username);
@@ -101,6 +107,7 @@ public class StudentClient extends BaseClient
 			Scanner keyboard = new Scanner(System.in);
 			
 			server = client.getValidServer(keyboard);
+			UDPClient udpClient = new UDPClient("mds-macbook-pro", 5001);
 			
 			client.showMenu();
 			
@@ -128,8 +135,10 @@ public class StudentClient extends BaseClient
 					System.out.println("Pass: ");
 					password = client.getValidString(keyboard);
 					
+					String request = "req:create:"+firstName+":"+lastName+":"+emailAddress+":"+phoneNumber+":"+userName+":"+password+":"+"Concordia"; //last part optional
+					client.getLogger(userName).info(udpClient.send(request));
 					//TODO what to do with institute name
-					client.getLogger(userName).info(""+server.createAccount(firstName, lastName, emailAddress, phoneNumber, userName, password, client.instituteName));
+					//client.getLogger(userName).info(""+server.createAccount(firstName, lastName, emailAddress, phoneNumber, userName, password, client.instituteName));
 
 					client.showMenu();
 					break;
