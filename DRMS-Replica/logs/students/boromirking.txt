@@ -1,0 +1,4 @@
+Nov 21, 2014 8:18:47 PM server.Student <init>
+INFO: Student created with username: boromirking
+Nov 21, 2014 8:18:47 PM server.Student borrowBook
+INFO: Just Borrowed Bones. Total borrows: 1

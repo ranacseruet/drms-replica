@@ -1,0 +1,12 @@
+Nov 23, 2014 1:35:26 PM server.LibraryServer run
+INFO: UPD server for Concordia is running on port: 6785
+Nov 23, 2014 1:35:48 PM server.LibraryServer createAccount
+INFO: Account creation success for user: rana
+Nov 23, 2014 1:36:00 PM server.LibraryServer findBook
+INFO: Book not found
+Nov 23, 2014 1:36:00 PM server.LibraryServer reserveInterLibrary
+INFO: Book Bones not available at Mcgill
+Nov 23, 2014 1:36:00 PM server.LibraryServer reserveInterLibrary
+INFO: Book Bones available at Montreal
+Nov 23, 2014 1:36:00 PM server.LibraryServer reserveBook
+INFO: Reserve successfull for user rana with book Bones. Now 0 left

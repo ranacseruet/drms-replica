@@ -1,0 +1,8 @@
+Nov 23, 2014 1:35:26 PM server.LibraryServer run
+INFO: UPD server for Montreal is running on port: 6787
+Nov 23, 2014 1:36:00 PM server.LibraryServer run
+INFO: Interlibrary reserve request recieved at: Montreal
+Nov 23, 2014 1:36:00 PM server.LibraryServer run
+INFO: Requested book Bones(Num Of Copy: 2)
+Nov 23, 2014 1:36:00 PM server.LibraryServer run
+INFO: Now, book Bones has 1) copies left

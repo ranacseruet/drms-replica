@@ -1,0 +1,2 @@
+Nov 21, 2014 8:21:34 PM server.Student <init>
+INFO: Student created with username: test2

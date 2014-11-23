@@ -1,0 +1,2 @@
+Nov 07, 2014 4:56:44 PM client.StudentClient main
+INFO: true

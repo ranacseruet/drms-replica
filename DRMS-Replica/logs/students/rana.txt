@@ -1,0 +1,6 @@
+Nov 23, 2014 1:35:48 PM client.StudentClient main
+INFO: true
+Nov 23, 2014 1:36:00 PM client.StudentClient main
+INFO: Direct Reserve failed. Trying with inter-library reserve request
+Nov 23, 2014 1:36:00 PM client.StudentClient main
+INFO: Inter-Library Reservation Success

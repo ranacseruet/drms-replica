@@ -1,0 +1,6 @@
+Nov 23, 2014 1:35:26 PM server.LibraryServer run
+INFO: UPD server for Mcgill is running on port: 6786
+Nov 23, 2014 1:36:00 PM server.LibraryServer run
+INFO: Interlibrary reserve request recieved at: Mcgill
+Nov 23, 2014 1:36:00 PM server.LibraryServer findBook
+INFO: Book not found
