@@ -351,6 +351,16 @@ public class LibraryServer implements ILibrary, Runnable
 					 response = createAccount(requestParts[2], requestParts[3], requestParts[4], 
 							 requestParts[5], requestParts[6], requestParts[7], requestParts[8])?"true":"false";
 				}
+				else if(requestParts[1].equals("create")){
+					//create account
+					 response = createAccount(requestParts[2], requestParts[3], requestParts[4], 
+							 requestParts[5], requestParts[6], requestParts[7], requestParts[8])?"true":"false";
+				}
+				//TODO other interface methods
+				else if(requestParts[1].equals("replica")){
+					//heartbeat/TODO update request check
+					response = "true";
+				}
 					
 				udpServer.sendResponse(response);
 			}

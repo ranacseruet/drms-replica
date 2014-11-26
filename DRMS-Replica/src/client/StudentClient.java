@@ -107,7 +107,7 @@ public class StudentClient extends BaseClient
 			Scanner keyboard = new Scanner(System.in);
 			
 			server = client.getValidServer(keyboard);
-			UDPClient udpClient = new UDPClient("mds-macbook-pro", 5001);
+			UDPClient udpClient = new UDPClient("PARTHHEAVEN", 3001);
 			
 			client.showMenu();
 			
