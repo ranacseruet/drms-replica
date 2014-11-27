@@ -2,6 +2,7 @@ package client;
 
 import java.util.Scanner;
 
+import UDP.UDPClient;
 import common.ILibrary;
 
 public class AdminClient extends BaseClient
@@ -21,7 +22,7 @@ public class AdminClient extends BaseClient
 			AdminClient client = new AdminClient();
 			client.initializeServers(args);
 			
-			ILibrary server;
+			UDPClient server;
 			
 			int userChoice=0;
 			Scanner keyboard = new Scanner(System.in);
@@ -49,7 +50,8 @@ public class AdminClient extends BaseClient
 					System.out.println("No Of Days: ");
 					short numOfDays = (short)client.getValidInt(keyboard);
 					//TODO what to do with institute name
-					client.logger.info(server.getNonRetuners(userName, password, server.toString(), numOfDays));
+					String request = "req:getnon:"+userName+":"+password+":concordia:"+numOfDays;
+					client.logger.info(server.send(request));
 					client.showMenu();
 					break;
 				case 2:

@@ -50,7 +50,7 @@ public class StudentClient extends BaseClient
 	{
 		
 		try {
-			ILibrary server = concordiaServer;
+			UDPClient server = concordiaServer;
 			//String username = "";
 			/*if(id == 0)
 			{
@@ -64,16 +64,17 @@ public class StudentClient extends BaseClient
 			String pass = "1234";
 			String bookName = "Bones";
 			String authorName = "Kathy";
-			UDPClient udpClient = new UDPClient("localhost", 5001);
-			String message = "req:create:eftakhairul:islam:rain@gmail.com:12342499:rain:pass123456:Concordia";
-			String response = udpClient.send(message);
+			String message = "req:create:firstName:lastName:email:phoneNumber:"+username+":"+pass+":Concordia";
+			String response = server.send(message);
 			System.out.println("UDP create account status: "+response);
 			boolean test =  Boolean.parseBoolean(response);
 			//boolean test = server.createAccount("test", "test", "test@test", "123123123", username, pass, "concordia");
 			if(test)
 			{
 				System.out.println("student created with username: "+username);
-				if(server.reserveInterLibrary(username, pass, bookName, authorName))
+				message = "req:reserv:"+username+":"+pass+":"+bookName+":"+authorName+":Concordia";
+				response = server.send(message);
+				if(Boolean.parseBoolean(response))
 				{
 					this.getLogger(username).info("Inter-Library Reservation Success with book: "+bookName);
 				}
@@ -101,19 +102,19 @@ public class StudentClient extends BaseClient
 			client.args = args;
 			client.initializeServers(args);
 			
-			ILibrary server;
+			UDPClient server;
 			
 			int userChoice=0;
 			Scanner keyboard = new Scanner(System.in);
 			
 			server = client.getValidServer(keyboard);
-			UDPClient udpClient = new UDPClient("PARTHHEAVEN", 3001);
 			
 			client.showMenu();
 			
 			String userName, password, inst;
 			boolean isSuccess;
 			int numThread;
+			String request;
 			while(true)
 			{
 				
@@ -135,8 +136,8 @@ public class StudentClient extends BaseClient
 					System.out.println("Pass: ");
 					password = client.getValidString(keyboard);
 					
-					String request = "req:create:"+firstName+":"+lastName+":"+emailAddress+":"+phoneNumber+":"+userName+":"+password+":"+"Concordia"; //last part optional
-					client.getLogger(userName).info(udpClient.send(request));
+					request = "req:create:"+firstName+":"+lastName+":"+emailAddress+":"+phoneNumber+":"+userName+":"+password+":"+"Concordia"; //last part optional
+					client.getLogger(userName).info(server.send(request));
 					//TODO what to do with institute name
 					//client.getLogger(userName).info(""+server.createAccount(firstName, lastName, emailAddress, phoneNumber, userName, password, client.instituteName));
 
@@ -151,13 +152,15 @@ public class StudentClient extends BaseClient
 					String bookName = client.getValidString(keyboard);
 					System.out.println("Author: ");
 					String authorName = client.getValidString(keyboard);
-					if(server.reserveBook(userName, password, bookName, authorName)) {
+					request = "req:reserv:"+userName+":"+password+":"+bookName+":"+authorName+":Concordia";
+					if(Boolean.parseBoolean(server.send(request))) {
 						client.getLogger(userName).info("Reserve Success");
 					}
 					else {
 						client.getLogger(userName).info("Direct Reserve failed. Trying with inter-library reserve request");
 						//Try to reserve on other libraries
-						if(server.reserveInterLibrary(userName, password, bookName, authorName)) {
+						request = "req:intrese:"+userName+":"+password+":"+bookName+":"+authorName+":Concordia";
+						if(Boolean.parseBoolean(server.send(request))) {
 							client.getLogger(userName).info("Inter-Library Reservation Success");
 						}
 						else {

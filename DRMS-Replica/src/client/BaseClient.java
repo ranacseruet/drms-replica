@@ -9,11 +9,12 @@ import java.util.logging.SimpleFormatter;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
+import UDP.UDPClient;
 import common.ILibrary;
 
 public abstract class BaseClient extends Thread
 {
-	ILibrary concordiaServer, mcgillServer, montrealServer;
+	UDPClient concordiaServer, mcgillServer, montrealServer;
 	static final String CONCORDIA="Concordia", MCGILL="Mcgill", MONTREAL="Montreal";
 	protected String instituteName;
 	
@@ -39,14 +40,28 @@ public abstract class BaseClient extends Thread
 	
 	//End Logger
 	
-	private ILibrary initServer(String[] args, String name) throws Exception {
+	private UDPClient initServer(String[] args, String name) throws Exception {
 		
-		URL url = new URL("http://localhost:8080/"+name+"?wsdl");
+		/*URL url = new URL("http://localhost:8080/"+name+"?wsdl");
 		QName qName = new QName("http://server/","LibraryServerService");
 		
 		Service service = Service.create(url, qName);		
-		ILibrary server = service.getPort(ILibrary.class); 
-		
+		ILibrary server = service.getPort(ILibrary.class);*/
+		String host = "localhost";
+		int port;
+		if(name.equals(CONCORDIA))
+		{
+			port = 5001;
+		}
+		else if(name.equals(MCGILL))
+		{
+			port = 5002;
+		}
+		else
+		{
+			port = 5001;
+		}
+		UDPClient server = new UDPClient(host, port);
 		return server;
 	}
 	
@@ -57,7 +72,7 @@ public abstract class BaseClient extends Thread
 		mcgillServer = initServer(args, MCGILL);	
 	}
 	
-	public ILibrary getServer(String inst) {
+	public UDPClient getServer(String inst) {
 		if(inst.equals(MONTREAL)) {
 			return montrealServer;
 		}
@@ -111,10 +126,10 @@ public abstract class BaseClient extends Thread
 		return userChoice;
 	}
 	
-	public ILibrary getValidServer(Scanner keyboard) {
+	public UDPClient getValidServer(Scanner keyboard) {
 		// Enforces a valid integer input.
 		Boolean valid = false;
-		ILibrary server = null;
+		UDPClient server = null;
 		System.out.println("Enter Institute Name");
 		System.out.println("'Concordia' For Concordia University");
 		System.out.println("'Mcgill' For Mcgill University");

@@ -304,18 +304,9 @@ public class LibraryServer implements ILibrary, Runnable
 	public void run()
 	{
 		UDPServer udpServer = null;
-		try {
-			
-			Endpoint endpoint = Endpoint.publish("http://localhost:8080/"+this.instituteName, this);
-			
-			if(endpoint.isPublished()) {
-				System.out.println("Endpoint published for "+this.instituteName);
-			}	
-			
+		try {	
 			//UDP part
 			udpServer = new UDPServer("",this.udpPort);
-			
-			byte [] buffer = new byte[10000];
 			this.logger.info("UPD server for "+this.instituteName+" is running on port: "+udpPort);
 			String response = "";
 			while(true) {
@@ -351,12 +342,21 @@ public class LibraryServer implements ILibrary, Runnable
 					 response = createAccount(requestParts[2], requestParts[3], requestParts[4], 
 							 requestParts[5], requestParts[6], requestParts[7], requestParts[8])?"true":"false";
 				}
-				else if(requestParts[1].equals("create")){
+				else if(requestParts[1].equals("reserv")){
 					//create account
-					 response = createAccount(requestParts[2], requestParts[3], requestParts[4], 
-							 requestParts[5], requestParts[6], requestParts[7], requestParts[8])?"true":"false";
+					 response = reserveBook(requestParts[2], requestParts[3], requestParts[4], 
+							 requestParts[5])?"true":"false";
 				}
-				//TODO other interface methods
+				else if(requestParts[1].equals("getnon")){
+					//create account
+					 response = getNonRetuners(requestParts[2], requestParts[3], requestParts[4], 
+							 Integer.parseInt(requestParts[5]));
+				}
+				else if(requestParts[1].equals("intrese")){
+					//create account
+					 response = reserveInterLibrary(requestParts[2], requestParts[3], requestParts[4], 
+							 requestParts[5])?"true":"false";
+				}
 				else if(requestParts[1].equals("replica")){
 					//heartbeat/TODO update request check
 					response = "true";
