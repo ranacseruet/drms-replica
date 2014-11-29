@@ -33,10 +33,9 @@ import org.omg.PortableServer.POAHelper;
 
 import UDP.UDPClient;
 import UDP.UDPServer;
-import common.*;
 
 @WebService(endpointInterface="common.ILibrary")
-public class LibraryServer implements ILibrary, Runnable
+public class LibraryServer implements Runnable
 {	
 	private static HashMap<Character, ArrayList<Student>> index = new HashMap<Character, ArrayList<Student>>();
 	
@@ -107,7 +106,6 @@ public class LibraryServer implements ILibrary, Runnable
 	}
 
 	
-	@Override
 	/**
 	 * Create new Account for student
 	 * @param firstName
@@ -153,7 +151,6 @@ public class LibraryServer implements ILibrary, Runnable
 	}
 
 	//TODO where to put sync???
-	@Override
 	/**
 	 * Reserve a book for user
 	 * @param username
@@ -223,7 +220,6 @@ public class LibraryServer implements ILibrary, Runnable
 	}
 	
 
-	@Override
 	/**
 	 * Get non returners for all libraries
 	 * @param username
@@ -498,7 +494,6 @@ public class LibraryServer implements ILibrary, Runnable
 		}
 	}
 
-	@Override
 	public boolean reserveInterLibrary(String username, String password,
 			String bookName, String authorName) {
 		
