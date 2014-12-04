@@ -32,6 +32,7 @@ import org.omg.PortableServer.POA;
 import org.omg.PortableServer.POAHelper;
 
 import UDP.UDPClient;
+import UDP.UDPMulticastServer;
 import UDP.UDPServer;
 
 @WebService(endpointInterface="common.ILibrary")
@@ -42,6 +43,9 @@ public class LibraryServer implements Runnable
 	private String instituteName;
 	private HashMap<String, Book> books   = new HashMap<String, Book>();
 	private int udpPort = 0;
+	//TODO change this
+	private int mcPort = 10000;
+	
 	private static ArrayList<LibraryServer> servers = new ArrayList<LibraryServer>();
 
 	//TODO change later
@@ -293,45 +297,96 @@ public class LibraryServer implements Runnable
 	    return response;
 	}
 	
-	private ORB orb;
+	class InterLibUDP extends Thread
+	{
+		int udpPort;
+		
+		public InterLibUDP(int udpPort)
+		{
+			this.udpPort = udpPort;
+		}
+		
+		public void run()
+		{
+			UDPServer udpServer = null;
+			UDPClient client = new UDPClient("localhost",11000);
+			try {	
+				//UDP part
+				udpServer = new UDPServer("", LibraryServer.this.udpPort);
+				String response = "";
+				LibraryServer.this.logger.info("Inter Library UPD server for "+LibraryServer.this.instituteName+" is running on port: "+LibraryServer.this.udpPort);
+				while(true) {
+					String data = udpServer.recieveRequest();
+					String[] requestParts = data.split(":");
+					
+					if(requestParts[1].equals("getnon")){
+						//create account
+						 response = getNonRetuners(requestParts[2], requestParts[3], requestParts[4], 
+								 Integer.parseInt(requestParts[5]));
+					}
+					else if(requestParts[0].equals("reserve")) {
+						//inter library reserve request
+						logger.info("Interlibrary reserve request recieved at: "+LibraryServer.this.instituteName);
+						Book book = findBook(requestParts[1], requestParts[2]);
+						if(book != null)
+						{
+							logger.info("Requested book "+book.getName()+"(Num Of Copy: "+book.getNumOfCopy()+")");
+							synchronized(book) 
+							{
+								book.setNumOfCopy(book.getNumOfCopy()-1);
+							}
+							response = "true";
+							logger.info("Now, book "+book.getName()+" has "+book.getNumOfCopy()+") copies left");
+						}
+						else
+						{
+							response = "false";
+						}
+					}
+					else if(requestParts[1].equals("replica")){
+						//heartbeat/TODO update request check
+						response = "true";
+					}
+					client.sendOnly(response);
+					//udpServer.sendResponse(response);
+				}
+			}		
+			catch(Exception err) {
+				err.printStackTrace();
+			}
+			finally{
+				udpServer.close();
+			}
+		}
+	}
+	
+	
 	/**
 	 * Run thread + UDP server 
 	 */
 	public void run()
 	{
-		UDPServer udpServer = null;
+		InterLibUDP iudp = new InterLibUDP(this.udpPort);
+		iudp.start();
+		
+		UDPMulticastServer udpServer = null;
 		try {	
 			//UDP part
-			udpServer = new UDPServer("",this.udpPort);
-			this.logger.info("UPD server for "+this.instituteName+" is running on port: "+udpPort);
+			udpServer = new UDPMulticastServer("225.4.5.6", this.mcPort);
+			//udpServer = new UDPServer("",this.mcPort);
+			this.logger.info("UPD server for "+this.instituteName+" is running on port: "+mcPort);
 			String response = "";
 			while(true) {
-				String data = udpServer.recieveRequest();
+				String data = udpServer.recieve();
 				String[] requestParts = data.split(":");
-				
+				if(!requestParts[requestParts.length-2].equals(this.instituteName)) {
+					//intended to other server, discard it
+					continue;
+				}
 				if(requestParts.length == 2 ) {
 					//non return request
 					logger.info("Nonreturner request received at"+this.instituteName);
 					response = calculateNonReturners(Integer.parseInt(requestParts[1].trim()));
-				}
-				else if(requestParts[0].equals("reserve")) {
-					//inter library reserve request
-					logger.info("Interlibrary reserve request recieved at: "+this.instituteName);
-					Book book = findBook(requestParts[1], requestParts[2]);
-					if(book != null)
-					{
-						logger.info("Requested book "+book.getName()+"(Num Of Copy: "+book.getNumOfCopy()+")");
-						synchronized(book) 
-						{
-							book.setNumOfCopy(book.getNumOfCopy()-1);
-						}
-						response = "true";
-						logger.info("Now, book "+book.getName()+" has "+book.getNumOfCopy()+") copies left");
-					}
-					else
-					{
-						response = "false";
-					}
 				}
 				else if(requestParts[1].equals("create")){
 					//create account
@@ -374,11 +429,12 @@ public class LibraryServer implements Runnable
 	 * @param instituteName
 	 * @param udpPort
 	 */
-	public LibraryServer(String instituteName, int udpPort)
+	public LibraryServer(String instituteName, int udpPort, int multiCastPort)
 	{
 		this.instituteName = instituteName;
 		this.udpPort	   = udpPort;
 		this.setLogger("logs/libraries/"+instituteName+".txt");
+		this.mcPort 	   = multiCastPort;
 	}
 	
 	/**
@@ -439,15 +495,15 @@ public class LibraryServer implements Runnable
 	{
 		try{
 
-			LibraryServer library1 = new LibraryServer("Concordia", 5001);
+			LibraryServer library1 = new LibraryServer("van", 5004, 5000);
 			Thread server1 =  new Thread(library1);
 			server1.start();
 			
-			LibraryServer library2 = new LibraryServer("Mcgill", 5002);
+			LibraryServer library2 = new LibraryServer("con", 5005, 5000);
 			Thread server2 =  new Thread(library2);
 			server2.start();
 			
-			LibraryServer library3 = new LibraryServer("Montreal", 5003);
+			LibraryServer library3 = new LibraryServer("dow", 5006, 5000);
 			Thread server3 =  new Thread(library3);
 			server3.start();
 			
