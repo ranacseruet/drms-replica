@@ -286,11 +286,11 @@ public class LibraryServer implements Runnable
 		        	//System.out.println("Student "+st.getUserName()+" has borrowed item, checking due date");
 		        	ArrayList<Borrow> list = st.getBorrows();
 		        	for(Borrow b : list) {
-		        		if(b.getDueDays() >= numOfDays) {
+		        		//if(b.getDueDays() >= numOfDays) {
 		        			response += this.instituteName+":"+st.getFirstName()+":"+st.getLastName()+":"+st.getPhoneNumber()+"::";
 		        			foundStudent = true;
 		        			break;
-		        		}
+		        		//}
 		        	}
 		        }
 	        }
@@ -298,7 +298,7 @@ public class LibraryServer implements Runnable
 	        //it.remove(); // avoids a ConcurrentModificationException
 	    }
 		
-	    if(!foundStudent) {
+	    if(foundStudent) {
 	    	response += "||";
 	    }
 	    
