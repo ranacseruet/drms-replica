@@ -249,7 +249,16 @@ public class LibraryServer implements Runnable
 		    	if(s.instituteName != this.instituteName) {
 		    			String requestData = "nonReturn:"+numOfDays;
 		    	        UDPClient client = new UDPClient("localhost", s.getUdpPort());
-		    	        response += client.send(requestData);
+		    	        String res = client.send(requestData);
+		    	        
+		    	        if(res == null || res.equals("true") || res.equals("false") || res.length() >=3)
+		    	        {
+		    	        	continue;
+		    	        }
+		    	        else
+		    	        {
+		    	        	response += res;
+		    	        }
 		    	}
 			}
         }
