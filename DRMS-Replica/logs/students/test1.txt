@@ -1,4 +1,0 @@
-Nov 21, 2014 8:21:34 PM server.Student <init>
-INFO: Student created with username: test1
-Nov 21, 2014 8:21:34 PM server.Student borrowBook
-INFO: Just Borrowed Bones. Total borrows: 1

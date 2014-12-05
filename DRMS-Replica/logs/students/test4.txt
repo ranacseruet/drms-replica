@@ -1,2 +1,0 @@
-Nov 07, 2014 5:41:47 PM server.Student <init>
-INFO: Student created with username: test4
