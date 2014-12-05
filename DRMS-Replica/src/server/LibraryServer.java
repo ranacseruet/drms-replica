@@ -1,5 +1,6 @@
 package server;
 
+import java.io.FileInputStream;
 import java.io.PrintWriter;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Scanner;
 import java.util.logging.FileHandler;
 import java.util.logging.LogRecord;
@@ -252,7 +254,7 @@ public class LibraryServer implements Runnable
 			}
         }
 	    
-	    return response;
+	    return response+"||5000";
 	}
 	
 	/**
@@ -262,7 +264,7 @@ public class LibraryServer implements Runnable
 	 */
 	private String calculateNonReturners(int numOfDays)
 	{
-		String response = this.instituteName+":\n";
+		String response = "";
 		Iterator it = this.index.entrySet().iterator();
 	    boolean foundStudent = false;
 		while (it.hasNext()) {
@@ -276,7 +278,7 @@ public class LibraryServer implements Runnable
 		        	ArrayList<Borrow> list = st.getBorrows();
 		        	for(Borrow b : list) {
 		        		if(b.getDueDays() >= numOfDays) {
-		        			response += st.getFirstName()+" "+st.getLastName()+" "+st.getPhoneNumber()+"\n";
+		        			response += this.instituteName+":"+st.getFirstName()+":"+st.getLastName()+":"+st.getPhoneNumber()+"::";
 		        			foundStudent = true;
 		        			break;
 		        		}
@@ -288,10 +290,10 @@ public class LibraryServer implements Runnable
 	    }
 		
 	    if(!foundStudent) {
-	    	response += "No student found\n";
+	    	response += "||";
 	    }
 	    
-	    response += "------*-------\n\n";
+	    //response += "------*-------\n\n";
 	   
 	    
 	    return response;
@@ -309,7 +311,6 @@ public class LibraryServer implements Runnable
 		public void run()
 		{
 			UDPServer udpServer = null;
-			UDPClient client = new UDPClient("localhost",11000);
 			try {	
 				//UDP part
 				udpServer = new UDPServer("", LibraryServer.this.udpPort);
@@ -319,7 +320,7 @@ public class LibraryServer implements Runnable
 					String data = udpServer.recieveRequest();
 					String[] requestParts = data.split(":");
 					
-					if(requestParts[1].equals("getnon")){
+					if(requestParts[1].equals("nonReturn")){
 						//create account
 						 response = getNonRetuners(requestParts[2], requestParts[3], requestParts[4], 
 								 Integer.parseInt(requestParts[5]));
@@ -347,8 +348,7 @@ public class LibraryServer implements Runnable
 						//heartbeat/TODO update request check
 						response = "true";
 					}
-					client.sendOnly(response);
-					//udpServer.sendResponse(response);
+					udpServer.sendResponse(response);
 				}
 			}		
 			catch(Exception err) {
@@ -370,9 +370,10 @@ public class LibraryServer implements Runnable
 		iudp.start();
 		
 		UDPMulticastServer udpServer = null;
+		UDPClient frontEndClient = new UDPClient(prop.getProperty("frontend.host"), Integer.parseInt(prop.getProperty("frontend.port")));
 		try {	
 			//UDP part
-			udpServer = new UDPMulticastServer("225.4.5.6", this.mcPort);
+			udpServer = new UDPMulticastServer(prop.getProperty("mc.host"), this.mcPort);
 			//udpServer = new UDPServer("",this.mcPort);
 			this.logger.info("UPD server for "+this.instituteName+" is running on port: "+mcPort);
 			String response = "";
@@ -383,6 +384,8 @@ public class LibraryServer implements Runnable
 					//intended to other server, discard it
 					continue;
 				}
+				
+				
 				if(requestParts.length == 2 ) {
 					//non return request
 					logger.info("Nonreturner request received at"+this.instituteName);
@@ -399,6 +402,7 @@ public class LibraryServer implements Runnable
 							 requestParts[5])?"true":"false";
 				}
 				else if(requestParts[1].equals("getnon")){
+					System.out.println("Got non returner request");
 					//create account
 					 response = getNonRetuners(requestParts[2], requestParts[3], requestParts[4], 
 							 Integer.parseInt(requestParts[5]));
@@ -412,8 +416,8 @@ public class LibraryServer implements Runnable
 					//heartbeat/TODO update request check
 					response = "true";
 				}
-					
-				udpServer.sendResponse(response);
+				frontEndClient.sendOnly(response);	
+				//udpServer.sendResponse(response);
 			}
 		}
 		catch(Exception err) {
@@ -487,6 +491,8 @@ public class LibraryServer implements Runnable
 		server.books.put(book.getName(), book);*/
 	}
 	
+	protected static Properties prop = new Properties();
+	
 	/**
 	 * Main entry point for server
 	 * @param args
@@ -494,16 +500,17 @@ public class LibraryServer implements Runnable
 	public static void main(String args[])
 	{
 		try{
-
-			LibraryServer library1 = new LibraryServer("van", 5004, 5000);
+			prop.load(new FileInputStream("replica.properties"));
+			
+			LibraryServer library1 = new LibraryServer("van", 5004, Integer.parseInt(prop.getProperty("mc.port")));
 			Thread server1 =  new Thread(library1);
 			server1.start();
 			
-			LibraryServer library2 = new LibraryServer("con", 5005, 5000);
+			LibraryServer library2 = new LibraryServer("con", 5005, Integer.parseInt(prop.getProperty("mc.port")));
 			Thread server2 =  new Thread(library2);
 			server2.start();
 			
-			LibraryServer library3 = new LibraryServer("dow", 5006, 5000);
+			LibraryServer library3 = new LibraryServer("dow", 5006, Integer.parseInt(prop.getProperty("mc.port")));
 			Thread server3 =  new Thread(library3);
 			server3.start();
 			
