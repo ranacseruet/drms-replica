@@ -416,7 +416,7 @@ public class LibraryServer implements Runnable
 					//heartbeat/TODO update request check
 					response = "true";
 				}
-				frontEndClient.sendOnly(response);	
+				frontEndClient.sendOnly(response+":5000");	
 				//udpServer.sendResponse(response);
 			}
 		}
@@ -502,15 +502,15 @@ public class LibraryServer implements Runnable
 		try{
 			prop.load(new FileInputStream("replica.properties"));
 			
-			LibraryServer library1 = new LibraryServer("van", 5004, Integer.parseInt(prop.getProperty("mc.port")));
+			LibraryServer library1 = new LibraryServer("van", Integer.parseInt(prop.getProperty("con.port")), Integer.parseInt(prop.getProperty("mc.port")));
 			Thread server1 =  new Thread(library1);
 			server1.start();
 			
-			LibraryServer library2 = new LibraryServer("con", 5005, Integer.parseInt(prop.getProperty("mc.port")));
+			LibraryServer library2 = new LibraryServer("con", Integer.parseInt(prop.getProperty("van.port")), Integer.parseInt(prop.getProperty("mc.port")));
 			Thread server2 =  new Thread(library2);
 			server2.start();
 			
-			LibraryServer library3 = new LibraryServer("dow", 5006, Integer.parseInt(prop.getProperty("mc.port")));
+			LibraryServer library3 = new LibraryServer("dow", Integer.parseInt(prop.getProperty("dow.port")), Integer.parseInt(prop.getProperty("mc.port")));
 			Thread server3 =  new Thread(library3);
 			server3.start();
 			
