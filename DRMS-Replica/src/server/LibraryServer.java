@@ -239,9 +239,9 @@ public class LibraryServer implements Runnable
 			String inst, int numOfDays) {
 		String response = "";
 		
-		if(!username.equals("Admin") || !password.equals("Admin")) {
+		/*if(!username.equals("Admin") || !password.equals("Admin")) {
 			return "Invalid Credential";
-		}
+		}*/
 		
 	    response += calculateNonReturners(numOfDays);
 	    for(LibraryServer s : servers) { 
@@ -322,8 +322,7 @@ public class LibraryServer implements Runnable
 					
 					if(requestParts[1].equals("nonReturn")){
 						//create account
-						 response = getNonRetuners(requestParts[2], requestParts[3], requestParts[4], 
-								 Integer.parseInt(requestParts[5]));
+						 response = calculateNonReturners(Integer.parseInt(requestParts[2]));
 					}
 					else if(requestParts[0].equals("reserve")) {
 						//inter library reserve request
@@ -386,12 +385,12 @@ public class LibraryServer implements Runnable
 				}
 				
 				
-				if(requestParts.length == 2 ) {
+				/*if(requestParts.length == 2 ) {
 					//non return request
 					logger.info("Nonreturner request received at"+this.instituteName);
-					response = calculateNonReturners(Integer.parseInt(requestParts[1].trim()));
+					response = getNonRetuners(requestParts[2], requestParts[3], requestParts[4],Integer.parseInt(requestParts[5].trim()));
 				}
-				else if(requestParts[1].equals("create")){
+				else*/if(requestParts[1].equals("create")){
 					//create account
 					 response = createAccount(requestParts[2], requestParts[3], requestParts[4], 
 							 requestParts[5], requestParts[6], requestParts[7], requestParts[8])?"true":"false";
